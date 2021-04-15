@@ -86,7 +86,6 @@ par(mfrow=c(1,2))
 plot(completetable$Discharge,type="l",main="HMisc")
 abline(h=0.0154, lty=2)
 plot(DischargeWM$Discharge,type="l",main="Missfores")
-
 abline(h=0.0154, lty=2)
 
 
