@@ -8,7 +8,12 @@
 # Pablo E. Gutiérrez-Fonseca
 # ---------------------------------------------
 #  
+rm(list=ls(all=TRUE)) #give R a blank slate
+# data<-read.table(file.choose(),header=T)
+
+install.packages('missForest')
 library(missForest)
+
 
 Discharge.frm=read.csv("Missing values/Discharge.csv")
 Discharge.frm
