@@ -8,22 +8,26 @@
 # Pablo E. Gutiérrez-Fonseca
 # ---------------------------------------------
 #  
+  
 rm(list=ls(all=TRUE)) #give R a blank slate
-# data<-read.table(file.choose(),header=T)
+
+#data<-read.table(file.choose(),header=T)
 
 install.packages('missForest')
 library(missForest)
 
+#setwd("D:/Curriculum/07_ Cursos/2019 Stream Ecology/Practicas/02 MissingData")
 
-Discharge.frm=read.csv("Missing values/Discharge.csv")
-Discharge.frm
-head(Discharge.frm)
 
-summary(Discharge.frm)
-plot(Discharge.frm$Discharge,type="l")
+Discharge=read.csv("Missing values/Discharge.csv")
+Discharge
+head(Discharge)
 
-Discharge.imp<- missForest(Discharge.frm, maxiter = 10, ntree = 100,
-                           variablewise = TRUE, decreasing = FALSE, verbose = FALSE, replace = TRUE,
+summary(Discharge)
+plot(Discharge$Discharge,type="l")
+
+Discharge.imp<- missForest(Discharge, maxiter = 4, ntree = 100,
+                           variablewise = TRUE, decreasing = FALSE, verbose = F, replace = TRUE,
                            classwt = NULL, cutoff = NULL, strata = NULL,
                            sampsize = NULL, nodesize = NULL, maxnodes = NULL,
                            xtrue = NA, parallelize = "no")
@@ -35,11 +39,11 @@ plot(DischargeWM$Discharge,type="l")
 
 windows()
 par(mfrow=c(1,3))
-plot(Discharge.frm$Discharge,type="l",main="Original Discharge")
+plot(Discharge$Discharge,type="l",main="Original Discharge")
 abline(h=0.0154, lty=2)
 plot(DischargeWM$Discharge,type="l",main="Imputated Discharge")
 abline(h=0.0154, lty=2)
-plot(Discharge.frm$Rain,type="l",main="Rain")
+plot(Discharge$Rain,type="l",main="Rain")
 
 
 #OOB Out Of Bag= imputation error estimate (normalized root mean squared error)
@@ -67,7 +71,7 @@ plot(Discharge.frm$Discharge,type="l")
 
 paste('How many missing values?', ' ', length(which(is.na(Discharge.frm))))
 
-impute_arg <-aregImpute(~ Day + Rain + Discharge, data = Discharge.frm, n.impute=100, nk=4, match='closest',
+impute_arg <-aregImpute(~ Rain + Discharge, data = Discharge.frm, n.impute=100, nk=4, match='closest',
                         plotTrans=FALSE,)
 
 impute_arg
@@ -87,7 +91,7 @@ plot(completetable$Discharge,type="l")
 
 # Compare methods 
 windows()
-par(mfrow=c(1,2))
+par(mfrow=c(1,3))
 plot(completetable$Discharge,type="l",main="HMisc")
 abline(h=0.0154, lty=2)
 plot(DischargeWM$Discharge,type="l",main="Missfores")
