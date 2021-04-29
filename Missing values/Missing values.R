@@ -11,7 +11,7 @@
   
 rm(list=ls(all=TRUE)) #give R a blank slate
 
-#data<-read.table(file.choose(),header=T)
+data<-read.table(file.choose(),header=T)
 
 install.packages('missForest')
 library(missForest)

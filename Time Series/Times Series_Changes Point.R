@@ -22,6 +22,7 @@ library("changepoint")
 Precipitation<- scan("Time Series/Precipitation.csv", skip=1)
 Precipitation.timeseries <- ts(Precipitation, frequency=12, start=c(1975,1), end=c(2016,12))
 
+
 plot(Precipitation.timeseries, main="Precipitation El Verde")
 
 Precipitation.timeseries
@@ -50,7 +51,7 @@ mvalueA = cpt.mean(Precipitation, method="AMOC") #AMOC, at most one change,
 cpts(mvalueA)
 plot(mvalueA)
 
-mvalueS = cpt.mean(Precipitation, method="BinSeg",Q=6) # BinSeg Binary Segmentation
+mvalueS = cpt.mean(Precipitation, method="BinSeg") # BinSeg Binary Segmentation
 cpts(mvalueS)
 cpts.ts(mvalueS)
 plot(mvalueS)
@@ -76,6 +77,6 @@ autoplot(cpt.mean(Precipitation, method="BinSeg"))
 install.packages("forecast")
 library('forecast')
 model <- auto.arima(Precipitation.timeseries)
-f <- forecast(model, 100)
+f <- forecast(model, 12)
 library(ggplot2)
 autoplot(f)
