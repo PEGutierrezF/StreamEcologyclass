@@ -1,6 +1,6 @@
 
 
-# https://stat.ethz.ch/education/semesters/ss2012/ams/paper/missForest_1.2.pdf
+
 
 # ---------------------------------------------
 # This is a practice for Missing value
@@ -11,19 +11,21 @@
   
 rm(list=ls(all=TRUE)) #give R a blank slate
 
-data<-read.table(file.choose(),header=T)
+# data<-read.table(file.choose(),header=T)
+#setwd("D:/Curriculum/07_ Cursos/2019 Stream Ecology/Practicas/02 MissingData")
+
 
 install.packages('missForest')
 library(missForest)
 
-#setwd("D:/Curriculum/07_ Cursos/2019 Stream Ecology/Practicas/02 MissingData")
+# https://stat.ethz.ch/education/semesters/ss2012/ams/paper/missForest_1.2.pdf
+# https://stats.stackexchange.com/questions/296060/how-to-interpret-ooberror-while-doing-data-imputation-with-missforest
 
 
 Discharge=read.csv("Missing values/Discharge.csv")
-Discharge
 head(Discharge)
-
 summary(Discharge)
+
 plot(Discharge$Discharge,type="l")
 
 Discharge.imp<- missForest(Discharge, maxiter = 4, ntree = 100,
@@ -50,6 +52,16 @@ plot(Discharge$Rain,type="l",main="Rain")
 # The OOB observations can be used for example for estimating the prediction error of RF
 
 Discharge.imp$OOBerror
+
+# How big are the errors of the imputation?
+# Not too bad, around >1%. NRME is The normalized root mean squared error, it is defined as:
+
+
+all_error <- missForest(Discharge)
+all_error$OOBerror           
+           
+by_variable_error <- missForest(Discharge, variablewise = TRUE)
+by_variable_error$OOBerror
 
 
 
