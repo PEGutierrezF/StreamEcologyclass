@@ -91,7 +91,7 @@ plot(completetable$Discharge,type="l")
 
 # Compare methods 
 windows()
-par(mfrow=c(1,3))
+par(mfrow=c(1,2))
 plot(completetable$Discharge,type="l",main="HMisc")
 abline(h=0.0154, lty=2)
 plot(DischargeWM$Discharge,type="l",main="Missfores")
