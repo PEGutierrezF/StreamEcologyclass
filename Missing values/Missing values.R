@@ -57,6 +57,8 @@ Discharge.imp$OOBerror
 # Not too bad, around >1%. NRME is The normalized root mean squared error, it is defined as:
 
 
+# Manera de reportar el errorCondition
+
 all_error <- missForest(Discharge)
 all_error$OOBerror           
            
