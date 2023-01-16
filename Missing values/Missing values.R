@@ -12,14 +12,11 @@
 rm(list=ls(all=TRUE)) #give R a blank slate
 
 # data<-read.table(file.choose(),header=T)
-#setwd("D:/Curriculum/07_ Cursos/2019 Stream Ecology/Practicas/02 MissingData")
+# setwd("D:/Curriculum/07_ Cursos/2019 Stream Ecology/Practicas/02 MissingData")
 
 
 install.packages('missForest')
 library(missForest)
-
-# https://stat.ethz.ch/education/semesters/ss2012/ams/paper/missForest_1.2.pdf
-# https://stats.stackexchange.com/questions/296060/how-to-interpret-ooberror-while-doing-data-imputation-with-missforest
 
 
 Discharge=read.csv("Missing values/Discharge.csv")
@@ -127,3 +124,9 @@ missmap(Discharge.frm)
 Completed_data<-amelia(Discharge.frm, idvars="Rain")
 summary(Completed_data)
 plot(Completed_data)
+
+
+Reference
+
+https://stat.ethz.ch/education/semesters/ss2012/ams/paper/missForest_1.2.pdf
+https://stats.stackexchange.com/questions/296060/how-to-interpret-ooberror-while-doing-data-imputation-with-missforest
