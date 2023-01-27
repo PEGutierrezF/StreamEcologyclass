@@ -101,12 +101,12 @@ cumulative_dat <- group_by(cum.data, waterYear) %>%
 
 
 # Minimun value -----------------------------------------------------------
-. <- cumulative_dat %>% 
+df <- cumulative_dat %>% 
   group_by(waterYear) %>% 
   summarize(mean = mean(Q.ft.s),
             sum = sum(Q.ft.s))
-min(.$sum[.$sum != min(.$sum)]) 
-min %>% filter_all(any_vars(. %in% c(303659)))
+min(df$sum[df$sum != min(df$sum)]) 
+df %>% filter_all(any_vars(. %in% c(303659)))
 
 
 q <- ggplot(cumulative_dat, aes(x = wy_doy, y = cumulative_dis, group = waterYear)) + 
@@ -148,3 +148,4 @@ References
 https://waterdata.usgs.gov/blog/data-munging/
 
 https://vt-hydroinformatics.github.io/fdcs.html
+
