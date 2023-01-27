@@ -2,10 +2,17 @@
 
 
 
+# ---------------------------------------------
+# Streamflow analysis (Stream Ecology course)
+# 26 Jan 2023
+# Pablo E. Gutiérrez-Fonseca
+# pabloe.gutierrezfonseca@gmail.com
+# ---------------------------------------------
+#  
 
 
 
-
+rm(list=ls(all=TRUE)) #give R a blank slate
 
 install.packages("dataRetrieval", 
                  repos=c("http://owi.usgs.gov/R",
@@ -22,6 +29,7 @@ library(ggplot2)
 library(data.table)
 library(dataRetrieval)
 library(hydroTSM)
+library(dplyr)
 
 
 # Data minning ------------------------------------------------------------
@@ -72,7 +80,7 @@ p +  geom_line() + theme(legend.position = "none")
 
 
 p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
-            geom_line(data = function(x) filter(x, year == 1936), size = 1) +
+            geom_line(data = function(x) filter(x, year == 1936), color="blue",size = 1) +
   theme_bw()
 
 
