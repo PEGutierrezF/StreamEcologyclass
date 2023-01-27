@@ -87,10 +87,10 @@ p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
 
 # More details ------------------------------------------------------------
 year.1936 <- setDT(winooski)[Date %between% c('1936-01-01', '1936-12-31')]
-no.2023   <- setDT(winooski)[(Date < '1936-01-01' | Date > '1936-12-31'),]
+not.1936   <- setDT(winooski)[(Date < '1936-01-01' | Date > '1936-12-31'),]
 
-summary(data.1936)
-summary(no.2023)
+summary(year.1936)
+summary(not.1936)
 
 
 
@@ -112,16 +112,16 @@ min %>% filter_all(any_vars(. %in% c(303659)))
 
 
 q <- ggplot(cumulative_dat, aes(x = wy_doy, y = cumulative_dis, group = waterYear)) + 
-  geom_line(lwd = 0.6) +
-  xlab("Julian Day") + ylab("Cumulative dischage (mm)") +
+  geom_line(lwd = 0.6, color='gray60') +
+  xlab("Julian Day") + ylab("Cumulative dischage (ft^3/s)") +
   ylim(c(0, 1300000)) +
   xlim(0,366) +
   theme_bw() 
 q
 
-q + geom_line(data=subset(cumulative_dat, waterYear == "1936"), colour="green", size=0.9) 
+q + geom_line(data=subset(cumulative_dat, waterYear == "1936"), colour="black", size=0.9) 
 q + geom_line(data=subset(cumulative_dat, waterYear == "2011"), colour="blue", size=0.9) 
-q + geom_line(data=subset(cumulative_dat, waterYear == "1965"), colour="blue", size=0.9) 
+q + geom_line(data=subset(cumulative_dat, waterYear == "1965"), colour="red", size=0.9) 
 
 
 # visually compare cumulative discharge across years
