@@ -146,7 +146,5 @@ fdc.1945.1965 = fdc(year.1965$Q.ft.s,new=FALSE,col="red")
 fdc.1995.2015 = fdc(year.2011$Q.ft.s,new=FALSE,col="blue")
 legend("topright",c("1936","1965","2011"),col=c("black","red","blue"),lty=c(1,1,1))
 
-
-
 References
 https://waterdata.usgs.gov/blog/data-munging/
