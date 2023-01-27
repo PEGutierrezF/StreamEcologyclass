@@ -32,15 +32,13 @@ library(hydroTSM)
 library(dplyr)
 
 
-# Data minning ------------------------------------------------------------
-
+# Data mining ------------------------------------------------------------
 # Try the code below with the site.code here, then use the site code for your watershed.
 site.code = "04290500"  #  The USGS streamgage code for Winnoski River at Esses
 
 readNWISsite(site.code)  # Note:  doing readNWISsite("04290500") gives the same result.
 what.data = whatNWISdata(siteNumber = site.code)
 what.data[1:10,]  # just look a first 10 records
-
 
 
 # Data manipulation -------------------------------------------------------
@@ -148,3 +146,5 @@ legend("topright",c("1936","1965","2011"),col=c("black","red","blue"),lty=c(1,1,
 
 References
 https://waterdata.usgs.gov/blog/data-munging/
+
+https://vt-hydroinformatics.github.io/fdcs.html
