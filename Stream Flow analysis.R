@@ -3,7 +3,7 @@
 
 
 # ---------------------------------------------
-# Streamflow analysis (Stream Ecology course)
+# Streamflow analysis (NR-280, Stream Ecology course)
 # 26 Jan 2023
 # Pablo E. Gutiérrez-Fonseca
 # pabloe.gutierrezfonseca@gmail.com
