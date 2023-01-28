@@ -84,17 +84,17 @@ p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
 
 
 # More details ------------------------------------------------------------
+# Analysis 1936 alone
 year.1936 <- setDT(winooski)[Date %between% c('1936-01-01', '1936-12-31')]
+# Analysis whole years except 1936
 not.1936   <- setDT(winooski)[(Date < '1936-01-01' | Date > '1936-12-31'),]
 
 summary(year.1936)
 summary(not.1936)
 
 
-?setDT
-
 # Cumulative analysis  ---------------------------------------------------
-cum.data <- addWaterYear(winooski)
+cum.data <- addWaterYear(winooski) # This add a new column with the year
 
 cumulative_dat <- group_by(cum.data, waterYear) %>% # Group by year
   mutate(cumulative_dis = cumsum(Q.ft.s), # Sum discharge
@@ -102,12 +102,12 @@ cumulative_dat <- group_by(cum.data, waterYear) %>% # Group by year
 
 
 # Minimum value -----------------------------------------------------------
-df <- cumulative_dat %>% 
-  group_by(waterYear) %>% 
-  summarize(mean = mean(Q.ft.s),
-            sum = sum(Q.ft.s))
-min(df$sum[df$sum != min(df$sum)]) 
-df %>% filter_all(any_vars(. %in% c(303659)))
+df <- cumulative_dat %>% # The previous dataframe
+  group_by(waterYear) %>% # Group by waterYear
+  summarize(mean = mean(Q.ft.s), # Give me the mean
+            sum = sum(Q.ft.s)) # Give me the sum
+min(df$sum[df$sum != min(df$sum)]) # Identify the min value in 'sum' column
+df %>% filter_all(any_vars(. %in% c(303659))) # Identify the entire row with the lowest value
 
 
 q <- ggplot(cumulative_dat, aes(x = wy_doy, y = cumulative_dis, 
