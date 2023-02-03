@@ -56,7 +56,6 @@ lines(lowess(time(rain.ts), rain.ts), col='red')
  #The sens.slope function in the trend package is used with a time series object.  
 # The sea.sens.slope function performs the test while taking into account the 
 # seasonality of the data.
-
 sens.slope(rain.ts)
 
 
@@ -64,7 +63,6 @@ sens.slope(rain.ts)
 # The pettitt.test function in the trend package identifies a point at which 
 # the values in the data change.  The results here suggest that the stage values 
 # were higher after May 2009 than before.
-
 pettitt.test(rain.ts)
 rain[244,]
 
@@ -113,3 +111,33 @@ plot(f1, main = "Monthly Precipitation with Forecasting through 2022",
 f <- forecast(model, 48)
 library(ggplot2)
 autoplot(f)
+
+
+
+# La selva Carapa ---------------------------------------------------------
+
+
+carapa.rich=read.csv("carapa.csv")
+carapa.richness <- carapa.rich[,1]
+
+carapa.ts <- ts(carapa.richness1, # Convert "Precipitation" to a time series object.
+              frequency=12, start=c(1997,1))
+head(carapa.sp, n=24) 
+
+
+library(remotes)
+install_github("cran/wq")
+library(wq)
+MannKendall(carapa.ts)
+mannKen(carapa.ts, type = c("slope", "relative"))
+
+carapa.richness1 <- na.omit(carapa.richness) 
+sens.slope(carapa.ts)
+
+func <- function(x,na.rm=T) {
+  if(sum(is.na(x)) == length(x)) return(NA)
+  if(na.rm) x <- x[!is.na(x)]
+  unlist(sens.slope(x)) 
+}
+
+func(carapa.ts)
