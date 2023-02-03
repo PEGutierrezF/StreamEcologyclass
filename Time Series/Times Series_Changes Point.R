@@ -19,50 +19,78 @@ library('Kendall')
 library("trend")
 library("changepoint")
 
-Precipitation<- scan("Time Series/Precipitation.csv", skip=1)
-Precipitation.timeseries <- ts(Precipitation, frequency=12, start=c(1975,1), end=c(2016,12))
 
+rain=read.csv("Precipitation.csv")
+rainEVFS <- rain[,3]
+  
+rain.ts <- ts(rainEVFS, # Convert "Precipitation" to a time series object.
+                    frequency=12, start=c(1975,1), end=c(2016,12))
+head(rain.ts, n=24) 
 
-plot(Precipitation.timeseries, main="Precipitation El Verde")
+plot(rain.ts, main="Precipitation El Verde")
 
-Precipitation.timeseries
 
 # Is there a trend? -------------------------------------------------------
+# We can use the Mann-Kendall Trend Test to see if there is a pattern in the data.
 
-mk.test(Precipitation.timeseries)
-MannKendall(Precipitation.timeseries)
-sens.slope(Precipitation.timeseries)
+MannKendall(rain.ts)
+
+###  tau is a measure of the strength of the trend
+###  p-value for trend is also shown
+
+# The test statistic is 0.0301, and the two-sided p-value associated with it is not 
+# less than 0.05. We cannot reject the null hypothesis of the test and conclude that 
+# no trend exists in the data because the p-value is greater than 0.05.
 
 
-# Single change point -----------------------------------------------------
-pettitt.test(Precipitation.timeseries)
+
+# Plot and trend ----------------------------------------------------------
+# Now we can add a smooth line to visualize the trend
+plot(rain.ts, main="Precipitation El Verde")
+lines(lowess(time(rain.ts), rain.ts), col='red')
 
 
+
+
+# Sen's slope -------------------------------------------------------------
+ #The sens.slope function in the trend package is used with a time series object.  
+# The sea.sens.slope function performs the test while taking into account the 
+# seasonality of the data.
+
+sens.slope(rain.ts)
+
+
+# Pettitt's test for change in value --------------------------------------
+# The pettitt.test function in the trend package identifies a point at which 
+# the values in the data change.  The results here suggest that the stage values 
+# were higher after May 2009 than before.
+
+pettitt.test(rain.ts)
+rain[244,]
 
 
 ### Multiple points
-
-
-mvalueP = cpt.mean(Precipitation, method="PELT") 
+#The next few commands will be used to find a potential change point in the mean. 
+mvalueP = cpt.mean(rain.ts, method="PELT") 
 cpts(mvalueP)
 plot(mvalueP)
 
-mvalueA = cpt.mean(Precipitation, method="AMOC") #AMOC, at most one change, 
+mvalueA = cpt.mean(rain.ts, method="AMOC") #AMOC, at most one change, 
 cpts(mvalueA)
 plot(mvalueA)
 
-mvalueS = cpt.mean(Precipitation, method="BinSeg") # BinSeg Binary Segmentation
+mvalueS = cpt.mean(rain.ts, method="BinSeg", Q=5) # BinSeg Binary Segmentation
 cpts(mvalueS)
-cpts.ts(mvalueS)
-plot(mvalueS)
+rain[c(7,189,255,420,468),]
+plot(mvalueS, cpt.width = 4)
+
 
 plot(mvalueS,type='l',cpt.col='red',xlab='Days',
      ylab='Rainfall (mm)',cpt.width=2, main="Rainfall at El Verde FS")
-
-
-
 abline(v=1994, lty=2)
 abline(v=2015,lty=2)
+
+
 
 
 
@@ -76,7 +104,12 @@ autoplot(cpt.mean(Precipitation, method="BinSeg"))
 
 install.packages("forecast")
 library('forecast')
-model <- auto.arima(Precipitation.timeseries)
-f <- forecast(model, 12)
+model <- auto.arima(rain.ts)
+f1 <- forecast::stlf(rain.ts, method = "naive")
+plot(f1, main = "Monthly Precipitation with Forecasting through 2022",
+     ylab = "Rainfall (mm)")
+
+
+f <- forecast(model, 48)
 library(ggplot2)
 autoplot(f)
