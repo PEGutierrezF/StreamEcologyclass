@@ -114,8 +114,7 @@ autoplot(f)
 
 
 
-# La selva Carapa ---------------------------------------------------------
-
+# La Selva, Carapa streams ---------------------------------------------------------
 
 carapa.rich=read.csv("carapa.csv")
 carapa.richness <- carapa.rich[,1]

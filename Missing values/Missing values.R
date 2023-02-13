@@ -70,11 +70,11 @@ NRMSE
 # The Normalized Root Mean Square Error (NRMSE) the RMSE facilitates the comparison between models with different scales. 
 
 #  Mean squared error (MSE)     
-by_variable_error <- missForest(Discharge, variablewise = TRUE)
+by_variable_error <- missForest(discharge.na, variablewise = TRUE)
 by_variable_error$OOBerror
 
-mean(Discharge$Discharge,na.rm=TRUE)
-(0.01560845 * (sqrt(NRMSE)))
+mean(discharge.na$Discharge,na.rm=TRUE)
+(0.01560845 * sqrt(NRMSE))
 
 
 
@@ -99,13 +99,13 @@ head(discharge.na)
 summary(discharge.na)
 plot(discharge.na$Discharge,type="l")
 
-paste('How many missing values?', ' ', length(which(is.na(Discharge.frm))))
+paste('How many missing values?', ' ', length(which(is.na(discharge.na))))
 
 # formula: The ~ Sepal.Length + . argument indicates what formula to use. In this case, we want all variables' missing data to be imputed, so we add each one.
 # data: the data frame with missing data.
 # n.impute: number of multiple imputations. 5 is frequently used, but 10 or more doesn't hurt
 set.seed(1)
-impute_arg <-aregImpute(Discharge ~ Rain , data = discharge.na, n.impute=100)
+impute_arg <- aregImpute(Discharge ~ Rain , data = discharge.na, n.impute=100)
 
 print(impute_arg, digits=3)
 impute_arg$imputed$Discharge
@@ -113,8 +113,6 @@ impute_arg$imputed$Discharge
 # The R square values indicate the liklihood that the predicted missing values in the 'irt' 
 # dataframe match what we would actually observe if participants had answered all questions. 
 # Higher values are better.
-
-
 
 # To use one of the iterations in our original data set, we can use the transcend function:
 completetable <- impute.transcan(impute_arg, imputation=4, data=discharge.na, 
@@ -140,6 +138,9 @@ plot(discharge.missf$Discharge,type="l",main="Missforest")
 abline(h=0.0154, lty=2)
 
 
+
+. <- with(discharge.na, impute(Discharge, mean))# 'random'
+plot(.,type="l")
 
 
 #########################
@@ -172,6 +173,8 @@ plot(b)
 Reference
 
 Stekhoven, D. J., & Bühlmann, P. (2012). MissForest-non-parametric missing value imputation for mixed-type data. Bioinformatics, 28(1), 112-118.
+
+https://medium.com/coinmonks/dealing-with-missing-data-using-r-3ae428da2d17
 
 https://stat.ethz.ch/education/semesters/ss2012/ams/paper/missForest_1.2.pdf
 https://stats.stackexchange.com/questions/296060/how-to-interpret-ooberror-while-doing-data-imputation-with-missforest
