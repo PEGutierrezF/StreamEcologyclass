@@ -41,7 +41,7 @@ what.data[1:10,]  # just look a first 10 records
 # Data manipulation -------------------------------------------------------
 parameter.code = "00060"  # this is the code for stream discharge.
 start.date = "1929-01-01"  # Blanks get all of the data
-end.date = "2022-12-31"
+end.date = "2023-12-31"
 #  Use your site code in the line below:
 winooski = readNWISdv("04290500", parameter.code, start.date, end.date)
 head(winooski)
@@ -77,7 +77,7 @@ p +  geom_line() + theme(legend.position = "none")
 
 
 p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
-            geom_line(data = function(x) filter(x, year == 1936), 
+            geom_line(data = function(x) filter(x, year == 2023), 
                       color="blue", linewidth = 1) +
   theme_bw()
 
@@ -121,7 +121,7 @@ q
 
 q + geom_line(data=subset(cumulative_dat, waterYear == "1936"), colour="black", size=0.9) 
 q + geom_line(data=subset(cumulative_dat, waterYear == "2011"), colour="blue", size=0.9) 
-q + geom_line(data=subset(cumulative_dat, waterYear == "1965"), colour="red", size=0.9) 
+q + geom_line(data=subset(cumulative_dat, waterYear == "2023"), colour="red", size=0.9) 
 
 
 # visually compare cumulative discharge across years
