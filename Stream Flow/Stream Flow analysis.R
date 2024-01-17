@@ -77,15 +77,14 @@ p +  geom_line() + theme(legend.position = "none")
 
 
 p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
-            geom_line(data = function(x) filter(x, year == 2023), 
+            geom_line(data = function(x) filter(x, year == 1936), 
                       color="blue", linewidth = 1) +
   theme_bw()
 
 
 
 # Frequency of events -----------------------------------------------------
-hist(winooski.df$Q.ft.s[winooski.df$Q.ft.s >= 1])
-
+hist(winooski.df$Q.ft.s)
 
 # More details ------------------------------------------------------------
 # Analysis 1936 alone
@@ -149,26 +148,69 @@ year.1936 <- setDT(winooski)[Date %between% c('1936-01-01', '1936-12-31')]
 year.1965 <- setDT(winooski)[Date %between% c('1965-01-01', '1965-12-31')]
 year.2011 <- setDT(winooski)[Date %between% c('2011-01-01', '2011-12-31')]
 
+# Combine into one dataset
+combined_years <- rbind(
+  data.frame(year = 1936, year.1936),
+  data.frame(year = 1965, year.1965),
+  data.frame(year = 2011, year.2011))
 
-year.1936. = fdc(year.1936$Q.ft.s,new=TRUE, ylab="Q ft3/s")
-year.1965. = fdc(year.1965$Q.ft.s,new=F,col="red")
-year.2011. = fdc(year.2011$Q.ft.s,new=F,col="blue")
-legend("topright",c("1936","1965","2011"),col=c("black","red","blue"),lty=c(1,1,1))
+combined_years <- combined_years %>%
+  group_by(year) %>%
+  mutate(rank = rank(-Q.ft.s)) %>% 
+  mutate(P = 100 * (rank / (length(Q.ft.s) + 1)))
 
-
-print(range(winooski$Q.ft.s))
-df.fdc.1936 = fdc(year.1936$Q.ft.s,new=TRUE, ylab="Q ft3/s",
-             las=1, cex.lab=1, cex.axis=0.8,yat=c(0.01,0.1,1,1,10,100,1000,3000),
-             ylim=c(20,50000))
-df.fdc.1965 = fdc(year.1965$Q.ft.s,new=FALSE,col="red", thr.shw=FALSE,
-                  xat=NA,yat=NA,ylim=c(20,50000),cex.axis=0.8)
-df.fdc.2011 = fdc(year.2011$Q.ft.s,new=FALSE,col="blue", thr.shw=FALSE, 
-                  xat=NA,yat=NA,ylim=c(20,50000),cex.axis=0.8)
-legend("topright",c("1936","1965","2011"),col=c("black","red","blue"),lty=c(1,1,1))
-
+ggplot(combined_years, aes(x = P, y = Q.ft.s, color = as.factor(year))) +
+  geom_line() +
+  scale_y_log10() +
+  xlab("% Time flow equalled or exceeded") +
+  ylab("Q (cfs)")
 
 
 References
 
 https://vt-hydroinformatics.github.io/fdcs.html
+
+
+
+#Flow is negative in rank() to make 
+#high flows ranked low (#1)
+winooski.df <- winooski.df %>%
+  mutate(rank = rank(-Q.ft.s)) %>%
+  mutate(P = 100 * (rank / (length(Q.ft.s) + 1)))
+
+
+winooski.df %>% ggplot(aes(x = P, y = Q.ft.s))+
+  geom_line()+
+  scale_y_log10()+
+  xlab("% Time flow equalled or exceeded")+
+  ylab("Q (cfs)")
+
+
+
+https://vt-hydroinformatics.github.io/fdcs.html
+
+siteid <- "09521000"
+startDate <- "1905-10-01"
+endDate <- "1965-10-01"
+parameter <- "00060"
+
+WS <- readNWISdv(siteid, parameter, startDate, endDate) %>% 
+  renameNWISColumns() %>%
+  mutate(year = year(Date)) %>%
+  mutate(period = case_when( year <= 1936 ~ "Pre Dam",
+                             year > 1936  ~ "Post Dam")) %>%
+  group_by(period) %>%
+  mutate(rank = rank(-Flow)) %>% 
+  mutate(P = 100 * (rank / (length(Flow) + 1)))
+
+flow <- ggplot(WS, aes(Date, Flow))+#, color = period))+
+  geom_line()+
+  ylab("Q (cfs)")
+
+fdc <- WS %>% ggplot(aes(x = P, y = Flow, color = period))+
+  geom_line()+
+  #scale_y_log10()+
+  xlab("% Time flow equalled or exceeded")+
+  ylab("Q (cfs)")
+
 
