@@ -83,6 +83,10 @@ p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
 
 
 
+# Frequency of events -----------------------------------------------------
+hist(winooski.df$Q.ft.s[winooski.df$Q.ft.s >= 1])
+
+
 # More details ------------------------------------------------------------
 # Analysis 1936 alone
 year.1936 <- setDT(winooski)[Date %between% c('1936-01-01', '1936-12-31')]
