@@ -147,12 +147,21 @@ ggplot(cumulative_dat, aes(x = wy_doy, y = cumulative_dis, group = waterYear)) +
 year.1936 <- setDT(winooski)[Date %between% c('1936-01-01', '1936-12-31')]
 year.1965 <- setDT(winooski)[Date %between% c('1965-01-01', '1965-12-31')]
 year.2011 <- setDT(winooski)[Date %between% c('2011-01-01', '2011-12-31')]
+year.2023 <- setDT(winooski)[Date %between% c('2023-01-01', '2023-12-31')]
 
 # Combine into one dataset
 combined_years <- rbind(
   data.frame(year = 1936, year.1936),
   data.frame(year = 1965, year.1965),
-  data.frame(year = 2011, year.2011))
+  data.frame(year = 2011, year.2011),
+  data.frame(year = 2011, year.2023))
+
+# Combine into one dataset
+combined_years <- rbind(
+  data.frame(year = 1936, year.1936),
+  data.frame(year = 1965, year.1965),
+  data.frame(year = 2011, year.2011),
+  data.frame(year = 2023, year.2023))
 
 combined_years <- combined_years %>%
   group_by(year) %>%
@@ -213,4 +222,4 @@ fdc <- WS %>% ggplot(aes(x = P, y = Flow, color = period))+
   xlab("% Time flow equalled or exceeded")+
   ylab("Q (cfs)")
 
-
+fdc
