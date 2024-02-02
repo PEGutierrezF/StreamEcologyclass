@@ -21,7 +21,7 @@ library("trend")
 library("changepoint")
 
 
-rain=read.csv("Precipitation.csv")
+rain = read.csv("Precipitation.csv")
 rainEVFS <- rain[,3]
   
 rain.ts <- ts(rainEVFS, # Convert "Precipitation" to a time series object.
@@ -120,9 +120,9 @@ autoplot(f)
 carapa.rich=read.csv("carapa.csv")
 carapa.richness <- carapa.rich[,1]
 
-carapa.ts <- ts(carapa.richness1, # Convert "Precipitation" to a time series object.
+carapa.ts <- ts(carapa.richness, # Convert "Precipitation" to a time series object.
               frequency=12, start=c(1997,1))
-head(carapa.sp, n=24) 
+head(carapa.ts, n=24) 
 
 
 library(remotes)
@@ -132,7 +132,7 @@ MannKendall(carapa.ts)
 mannKen(carapa.ts, type = c("slope", "relative"))
 
 carapa.richness1 <- na.omit(carapa.richness) 
-sens.slope(carapa.ts)
+sens.slope(carapa.richness1)
 
 func <- function(x,na.rm=T) {
   if(sum(is.na(x)) == length(x)) return(NA)
