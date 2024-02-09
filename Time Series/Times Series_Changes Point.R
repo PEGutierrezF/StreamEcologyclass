@@ -86,58 +86,151 @@ plot(mvalueS, cpt.width = 4)
 
 plot(mvalueS,type='l',cpt.col='red',xlab='Days',
      ylab='Rainfall (mm)',cpt.width=2, main="Rainfall at El Verde FS")
-abline(v=1994, lty=2)
-abline(v=2015,lty=2)
+abline(v=1994, lty=2, lwd=3, col='blue')
+abline(v=2015,lty=2, lwd=3, col='red')
 
 
 
 
+# Rain La Selva  ----------------------------------------------------------
 
-if(!require(devtools)) install.packages("devtools")
-devtools::install_github("sinhrks/ggfortify")
-library("ggfortify")
-autoplot(cpt.mean(Precipitation, method="BinSeg"))
-
-
-
-
-install.packages("forecast")
-library('forecast')
-model <- auto.arima(rain.ts)
-f1 <- forecast::stlf(rain.ts, method = "naive")
-plot(f1, main = "Monthly Precipitation with Forecasting through 2022",
-     ylab = "Rainfall (mm)")
-
-
-f <- forecast(model, 48)
+library(tidyverse)
+library(quantmod)
+library(xts)
+library(emmeans)
+library(gganimate)
+library(broom)
 library(ggplot2)
-autoplot(f)
+library("ggpubr")
+library(WaveletComp)
+library(dplyr)
+
+setwd("D:/Curriculum/14_ Colaboracion/R help/La Selva rain/")
+rain=read.csv("LaSelvaDailyrainfall.csv")
+summary(rain)
+
+
+rainLaSelva <- rain %>% select(date,rain) %>%
+  filter(!is.na(date)) %>%
+  filter(!is.na(rain))
+
+summary(rainLaSelva)
+head(rainLaSelva)
+
+rainLaSelva$date<-as.POSIXct(rainLaSelva$date,"%Y-%m-%d",tz = "UTC")
+
+
+#convert to xts (time series) object !!! assumes records of observations are ordered by time !!!
+rainxts <- xts(rainLaSelva[,-1], order.by=rainLaSelva[,1])
+
+# a few functions to check attributes
+index(rainxts)
+str(rainxts)
+tzone(rainxts)
+nmonths(rainxts)
+nyears(rainxts)
 
 
 
-# La Selva, Carapa streams ---------------------------------------------------------
-
-carapa.rich=read.csv("carapa.csv")
-carapa.richness <- carapa.rich[,1]
-
-carapa.ts <- ts(carapa.richness, # Convert "Precipitation" to a time series object.
-              frequency=12, start=c(1997,1))
-head(carapa.ts, n=24) 
+threshold.peak<-62
+LSrainpeaks<-findPeaks(rainxts, thresh=threshold.peak)
+plot(rainxts[LSrainpeaks-1])
 
 
-library(remotes)
-install_github("cran/wq")
-library(wq)
-MannKendall(carapa.ts)
-mannKen(carapa.ts, type = c("slope", "relative"))
+#turn peaks into a dataframe to add it to a ggplot of the raw data
+#and calculate metrics
+#here we use 20 threshold
+peaks<-as.data.frame(rainxts[LSrainpeaks-1])
+head(peaks)
 
-carapa.richness1 <- na.omit(carapa.richness) 
-sens.slope(carapa.richness1)
+#plot peaks onto raw data for precipitation
+peaks_graphic <-ggplot(rainLaSelva, aes(x = date, y = rain)) +
+  geom_line(colour='blue') +
+  labs(x = "Date",
+       y = "Precipitation (mm)") +
+  geom_point(data=peaks,aes(x = as.POSIXct(row.names(peaks)), y = V1), colour='red')
+peaks_graphic
 
-func <- function(x,na.rm=T) {
-  if(sum(is.na(x)) == length(x)) return(NA)
-  if(na.rm) x <- x[!is.na(x)]
-  unlist(sens.slope(x)) 
-}
 
-func(carapa.ts)
+
+
+
+
+
+
+#how many peaks per total obs, which are in units of days (here, obs = 365 days*33 years) ?
+peak_per_d <- length(peaks$V1)/length(rainLaSelva$precip)
+peak_per_d
+
+#how many peaks per year?
+peaks_per_y<-length(peaks$V1)/nyears(rainxts)
+peaks_per_y
+
+#average peak magnitude (in mm for precip)
+peak_mean<-mean(peaks$V1)
+peak_mean
+
+#peak standard deviation
+peak_sd<-sd(peaks$V1)
+
+#peak CV
+peak_CV<-sd(peaks$V1)/mean(peaks$V1)
+peak_CV
+
+#turn peaks into a dataframe to add it to a ggplot of the raw data
+#and calculate metrics
+#here we use 20 threshold
+peaks<-as.data.frame(rainxts[LSrainpeaks-1])
+
+# add year and time columns to peaks dataset
+peaks$time<-as.POSIXct(row.names(peaks))
+peaks$year<-as.numeric(format(as.POSIXct(row.names(peaks)),"%Y"))
+
+
+#### peak number vs. time
+# get slope of number of peaks per year for each year vs. year (and p-value)
+# first, add any missing years that had no peaks (add zeros) - probably a more efficient way to do this...
+year<-min(as.numeric(format(as.POSIXct(rainLaSelva$date),"%Y"))):max(as.numeric(format(as.POSIXct(rainLaSelva$date),"%Y")))
+years<-as.data.frame(year)
+years
+peak.sum<-peaks %>% group_by(year) %>% summarise(mean.peak=mean(V1), count=n())
+peak.sum
+peak.number<-merge(years,peak.sum,by.x="year",by.y="year",all.x=TRUE)
+peak.number[is.na(peak.number)] <- 0 
+peak.number
+
+
+
+
+# second, build the stats models and save the slope and p as output
+peak.number.lm<-lm(count~year,data=peak.number)
+#plot(peak.number.lm) # turn this on to check model statistical assumptions
+lmsum.number<-summary(peak.number.lm)
+peak.number.slope<-peak.number.lm$coefficients[2]
+peak.number.slope
+peak.number.p<-lmsum.number$coefficients[2,4]
+peak.number.p
+lmsum.number$r.squared
+
+
+
+
+peaks <- ggplot(peak.number, aes(x = year, y = count)) + 
+  geom_point() +
+  xlab('Year')+ ylab("Number of peaks (>62mm)") +
+  stat_smooth(method = "lm", col = "blue") + 
+  
+  stat_cor(label.y = 13,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  stat_regline_equation(label.y = 12) +
+  
+  theme(axis.title.x = element_text(size = 14, angle = 0)) + # axis x
+  theme(axis.title.y = element_text(size = 14, angle = 90)) + # axis y
+  theme(axis.text.x=element_text(angle=0, size=12, vjust=0.5, color="black")) + #subaxis x
+  theme(axis.text.y=element_text(angle=0, size=12, vjust=0.5, color="black")) + #subaxis y
+  
+  theme_classic() 
+
+peaks
+
+

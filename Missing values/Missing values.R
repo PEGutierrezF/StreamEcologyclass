@@ -23,7 +23,7 @@ rm(list=ls(all=TRUE)) #give R a blank slate
 # It yields an out-of-bag (OOB) imputation error estimate without the need of 
 # a test set or elaborate cross-validation.
 
-install.packages('missForest')
+install.packages('missForest', dependencies = TRUE)
 library(missForest)
 
 
@@ -37,11 +37,7 @@ plot(discharge.na$Discharge,type="l", lwd=2.0)
 # ntree number of trees to grow in each forest.
 # maxiter maximum number of iterations to be performed given the stopping criterion is
 # not met beforehand.
-discharge.imp <- missForest(discharge.na, maxiter = 4, ntree = 100,
-                           variablewise = FALSE, decreasing = FALSE, verbose = F, replace = TRUE,
-                           classwt = NULL, cutoff = NULL, strata = NULL,
-                           sampsize = NULL, nodesize = NULL, maxnodes = NULL,
-                           xtrue = NA, parallelize = "no")
+discharge.imp <- missForest(discharge.na, maxiter = 4, ntree = 100)
 
 discharge.missf <- discharge.imp$ximp
 summary(discharge.missf)
@@ -83,6 +79,7 @@ mean(discharge.na$Discharge,na.rm=TRUE)
 #		Hmisc
 # Harrell Miscellaneous
 #########################
+# Using the argImpute function, Hmisc performs multiple imputation using bootstraping and predictive mean matching.
 
 rm(list=ls(all=TRUE)) #give R a blank slate
 
