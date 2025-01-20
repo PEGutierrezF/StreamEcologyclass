@@ -23,11 +23,17 @@ library(rgdal)
 library(hydroTSM)
 library(dataRetrieval)  # USGS package that gets streamflow data direct from the USGS website
 library(waterData)
-library(ggplot2)
-library(data.table)
-library(lubridate)
-library(dplyr)
 
+
+
+
+
+install.packages("dataRetrieval")
+library(dataRetrieval)  # USGS package that gets streamflow data direct from the USGS website
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(data.table) # setDT
 
 # Data mining ------------------------------------------------------------
 # Try the code below with the site.code here, then use the site code for your watershed.
@@ -85,6 +91,7 @@ p +  geom_line(aes(group = year), color = "gray20", alpha = 0.1) +
 
 # Frequency of events -----------------------------------------------------
 hist(winooski.df$Q.ft.s)
+
 
 # More details ------------------------------------------------------------
 # Analysis 1936 alone
