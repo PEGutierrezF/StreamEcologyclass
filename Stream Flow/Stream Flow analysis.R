@@ -35,10 +35,17 @@ library(lubridate)
 library(ggplot2)
 library(data.table) # setDT
 
+
 # Data mining ------------------------------------------------------------
 # Try the code below with the site.code here, then use the site code for your watershed.
 site.code = "04290500"  #  The USGS streamgage code for Winnoski River Near Essex Junction
 
+
+# Find the basin ---------------------------------------------------------
+basin <- dataRetrieval::findNLDI(nwis=site.code, find="basin")$basin
+plot(basin)
+
+# 
 readNWISsite(site.code)  # Note:  doing readNWISsite("04290500") gives the same result.
 what.data = whatNWISdata(siteNumber = site.code)
 what.data[1:10,]  # just look a first 10 records
@@ -47,11 +54,12 @@ what.data[1:10,]  # just look a first 10 records
 # Data manipulation -------------------------------------------------------
 parameter.code = "00060"  # this is the code for stream discharge.
 start.date = "1929-01-01"  # Blanks get all of the data
-end.date = "2023-12-31"
+end.date = "2024-12-31"
 #  Use your site code in the line below:
 winooski = readNWISdv("04290500", parameter.code, start.date, end.date)
 head(winooski)
 tail(winooski)
+
 
 # Changes names -----------------------------------------------------------
 # The names for the discharge and QA columns aren't very nice, so rename them:
@@ -103,6 +111,7 @@ summary(year.1936)
 summary(not.1936)
 
 
+
 # Cumulative analysis  ---------------------------------------------------
 cum.data <- addWaterYear(winooski) # This add a new column with the year
 
@@ -120,18 +129,35 @@ min(df$sum[df$sum != min(df$sum)]) # Identify the min value in 'sum' column
 df %>% filter_all(any_vars(. %in% c(303659))) # Identify the entire row with the lowest value
 
 
+# Maximum value -----------------------------------------------------------
+df_max <- cumulative_dat %>% # The previous dataframe
+  group_by(waterYear) %>% # Group by waterYear
+  summarize(mean = mean(Q.ft.s, na.rm = TRUE), # Calculate mean
+            sum = sum(Q.ft.s, na.rm = TRUE)) # Calculate sum
+# Identify the max value in 'sum' column
+max_value <- max(df_max$sum)
+# Identify the entire row with the maximum sum value
+max_row <- df_max %>% filter(sum == max_value)
+# Print the row with the maximum sum value
+print(max_row)
+
+
+# Base plot
 q <- ggplot(cumulative_dat, aes(x = wy_doy, y = cumulative_dis, 
                                 group = waterYear)) + 
   geom_line(lwd = 0.6, color='gray60') +
-  xlab("Julian Day") + ylab("Cumulative dischage (ft^3/s)") +
+  xlab("Julian Day") + 
+  ylab("Cumulative discharge (ft^3/s)") +
   ylim(c(0, 1300000)) +
   xlim(0,366) +
   theme_bw() 
-q
 
-q + geom_line(data=subset(cumulative_dat, waterYear == "1936"), colour="black", size=0.9) 
-q + geom_line(data=subset(cumulative_dat, waterYear == "2011"), colour="blue", size=0.9) 
-q + geom_line(data=subset(cumulative_dat, waterYear == "2023"), colour="red", size=0.9) 
+# Highlight specific years (1936, 2011, 1965)
+q + 
+  geom_line(data = subset(cumulative_dat, waterYear == 2023), colour = "black", size = 0.9) +
+  geom_line(data = subset(cumulative_dat, waterYear == 2011), colour = "blue", size = 0.9) +
+  geom_line(data = subset(cumulative_dat, waterYear == 1965), colour = "red", size = 0.9)
+
 
 
 # visually compare cumulative discharge across years
