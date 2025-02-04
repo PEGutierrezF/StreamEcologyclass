@@ -71,17 +71,19 @@ rain[244,]
 
 ### Multiple points
 #The next few commands will be used to find a potential change point in the mean. 
+
+# AMOC is best for detecting a single change point.
+mvalueA = cpt.mean(rain.ts, method="AMOC") #AMOC, At Most One Change(AMOC) 
+cpts(mvalueA)
+plot(mvalueA)
+
+# PELT finds multiple change points optimally using dynamic programming.
 mvalueP = cpt.mean(rain.ts, method="PELT") 
 cpts(mvalueP)
 plot(mvalueP,type="l")
 
-
-
-mvalueA = cpt.mean(rain.ts, method="AMOC") #AMOC, at most one change, 
-cpts(mvalueA)
-plot(mvalueA)
-
-
+# BinSeg also detects multiple change points but uses a greedy, 
+#recursive approach, making it faster but sometimes less accurate than PELT.
 mvalueS = cpt.mean(rain.ts, method="BinSeg", Q=5) # BinSeg Binary Segmentation
 cpts(mvalueS)
 rain[c(7,189,255,420,468),]
