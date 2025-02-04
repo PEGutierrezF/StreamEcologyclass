@@ -15,11 +15,12 @@
 install.packages("trend")
 install.packages("Kendall")
 install.packages("changepoint")
+install.packages('Rbeast')
 
 library('Kendall') 
 library("trend")
 library("changepoint")
-
+library(Rbeast)
 
 rain = read.csv("Precipitation.csv")
 rainEVFS <- rain[,3]
@@ -72,11 +73,14 @@ rain[244,]
 #The next few commands will be used to find a potential change point in the mean. 
 mvalueP = cpt.mean(rain.ts, method="PELT") 
 cpts(mvalueP)
-plot(mvalueP)
+plot(mvalueP,type="l")
+
+
 
 mvalueA = cpt.mean(rain.ts, method="AMOC") #AMOC, at most one change, 
 cpts(mvalueA)
 plot(mvalueA)
+
 
 mvalueS = cpt.mean(rain.ts, method="BinSeg", Q=5) # BinSeg Binary Segmentation
 cpts(mvalueS)
@@ -89,8 +93,11 @@ plot(mvalueS,type='l',cpt.col='red',xlab='Days',
 abline(v=1994, lty=2, lwd=3, col='blue')
 abline(v=2015,lty=2, lwd=3, col='red')
 
-
-
+https://search.r-project.org/CRAN/refmans/Rbeast/html/beast.html
+https://stackoverflow.com/questions/67749982/changepoints-detection-in-time-series-in-r
+out=beast(rain.ts, season='none')
+plot(out)
+print(out)
 
 # Rain La Selva  ----------------------------------------------------------
 
