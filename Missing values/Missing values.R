@@ -119,25 +119,42 @@ head(completetable)
 plot(completetable$Discharge,type="l")
 
 
-f <-  fit.mult.impute(Discharge ~ Rain , lm, impute_arg, 
-                      data=discharge.na)
-summary(f)
-# aregImpute	Multiple imputation based on additive regression,
-# bootstrapping, and predictive mean matching
+#########################
+#		MICE
+#########################
+
+install.packages('VIM')
+library(mice)
+library(VIM)
+md.pattern(discharge.na)
+aggr_plot <- aggr(discharge.na, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, 
+                  labels=names(discharge.na), cex.axis=.7, 
+                  gap=3, ylab=c("Histogram of missing data","Pattern"))
 
 
-# Compare methods 
-windows()
-par(mfrow=c(1,2))
+discharge.mice <- mice(discharge.na, method = "pmm",)
+summary(discharge.mice)
+completed_data <- complete(discharge.mice, action = "long")  # Extracts all imputations in long format
+completed_data1 <- complete(discharge.mice, action = 1)  # Extracts the first imputed dataset
+plot(completed_data1$Discharge, type = "l", main = "Discharge Plot", xlab = "Index", ylab = "Discharge")
+
+
+
+densityplot(my_imp)
+
+
+
+#########################
+# Compare methods
+#########################
+par(mfrow=c(1,3))
 plot(completetable$Discharge,type="l",main="HMisc")
 abline(h=0.0154, lty=2)
 plot(discharge.missf$Discharge,type="l",main="Missforest")
 abline(h=0.0154, lty=2)
+plot(completed_data1$Discharge, type = "l", main = "MICE", xlab = "Index", ylab = "Discharge")
+abline(h=0.0154, lty=2)
 
-
-
-. <- with(discharge.na, impute(Discharge, mean))# 'random'
-plot(.,type="l")
 
 
 #########################
