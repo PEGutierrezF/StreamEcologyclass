@@ -13,6 +13,8 @@
 library(dataRetrieval); library(ggplot2) ; library(sf)
 library(dplyr); library(ggspatial); library(leaflet); library(EGRET)
 
+# EGRET  Exploration and Graphics for RivEr Trends (EGRET) 
+
 #For example, let's see which sites ever measured phosphorus at 
 #least 100 times over at least 20 years in Arizona. Water quality 
 #data is exclusively found in WQP functions.
@@ -107,3 +109,11 @@ multiPlotDataOverview(eList)
 # Flux(kg/day)=Concentration(mg/L)×Discharge(L/day)
 # Sample data plot: observed log flux vs log discharge
 plotFluxQ(eList, fluxUnit=4)
+
+year0 <- 1990
+year1 <- 2009
+qBottom <- 0.5
+qTop <- 20
+maxDiff<-0.5
+eList <- Choptank_eList
+plotDiffContours(eList, year0, year1, qBottom, qTop, maxDiff = 0.5)
